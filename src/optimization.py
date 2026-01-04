@@ -40,7 +40,7 @@ def scenario_returns(regression_results, scenarios):
     return scenario_ret
 
 
-def monte_carlo_simulation(returns, n_simulations=10000, horizon_days=252):
+def monte_carlo_simulation(returns, n_simulations=10000, horizon_days=252, random_seed=42):
     """
     Monte Carlo simulation for future return distribution.
     
@@ -48,6 +48,7 @@ def monte_carlo_simulation(returns, n_simulations=10000, horizon_days=252):
         returns: DataFrame with returns
         n_simulations: Number of simulations
         horizon_days: Forecast horizon in days
+        random_seed: Random seed for reproducibility (default: 42)
         
     Returns:
         DataFrame with simulation results
@@ -56,7 +57,7 @@ def monte_carlo_simulation(returns, n_simulations=10000, horizon_days=252):
     
     results = {}
     # Seed once for reproducibility across assets
-    np.random.seed(42)
+    np.random.seed(random_seed)
     # Use Student's t distribution for heavy tails
     df_t = 5  # degrees of freedom; lower df => heavier tails
     
@@ -149,7 +150,7 @@ def create_score_matrix(val_scores, qual_scores, risk_metrics, mc_results, weigh
 
 
 def simulated_annealing_selection(scores_df, n_select=1, T_init=1.0, T_min=0.001, 
-                                   alpha=0.995, max_iter=10000):
+                                   alpha=0.995, max_iter=10000, random_seed=42):
     """
     Simulated Annealing for 0/1 asset selection.
     Objective: maximize total score with constraint to select exactly n_select assets.
@@ -161,6 +162,7 @@ def simulated_annealing_selection(scores_df, n_select=1, T_init=1.0, T_min=0.001
         T_min: Minimum temperature
         alpha: Cooling rate
         max_iter: Maximum iterations
+        random_seed: Random seed for reproducibility (default: 42)
         
     Returns:
         Tuple of (selected_tickers, best_objective)
@@ -177,7 +179,7 @@ def simulated_annealing_selection(scores_df, n_select=1, T_init=1.0, T_min=0.001
     scores = scores_df['final_score'].values
     
     # Initial state: randomly select n_select assets
-    np.random.seed(42)
+    np.random.seed(random_seed)
     current_state = np.zeros(n, dtype=int)
     initial_idx = np.random.choice(n, n_select, replace=False)
     current_state[initial_idx] = 1

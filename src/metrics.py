@@ -10,6 +10,11 @@ import statsmodels.api as sm
 from scipy import stats
 
 
+# Constants for debt-to-equity ratio conversion
+D_E_RATIO_MIN_THRESHOLD = 1  # Minimum value to consider as percentage
+D_E_RATIO_MAX_THRESHOLD = 100  # Maximum value to consider as percentage
+
+
 def calculate_returns(prices):
     """Calculate logarithmic daily returns."""
     return np.log(prices / prices.shift(1)).dropna()
@@ -116,10 +121,10 @@ def calculate_quality_metrics(fund_df):
     
     # Leverage
     # Debt/Equity: yfinance often returns percentage rather than ratio
-    # Convert values > 1 and <= 100 to ratios (divide by 100)
+    # Convert values > D_E_RATIO_MIN_THRESHOLD and <= D_E_RATIO_MAX_THRESHOLD to ratios (divide by 100)
     d_to_e_raw = fund_df['debtToEquity']
     d_to_e_adj = d_to_e_raw.apply(
-        lambda x: x / 100 if pd.notna(x) and 1 < x <= 100 else x
+        lambda x: x / 100 if pd.notna(x) and D_E_RATIO_MIN_THRESHOLD < x <= D_E_RATIO_MAX_THRESHOLD else x
     )
     qual['debt_to_equity'] = d_to_e_adj
     qual['net_debt'] = fund_df['totalDebt'] - fund_df['totalCash']

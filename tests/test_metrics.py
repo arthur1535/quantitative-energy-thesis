@@ -19,6 +19,16 @@ from src.metrics import (
 )
 
 
+# Test configuration
+TEST_RANDOM_SEED = 42
+
+
+@pytest.fixture
+def random_seed():
+    """Fixture to provide consistent random seed for tests."""
+    return TEST_RANDOM_SEED
+
+
 def test_max_drawdown():
     """Test if max drawdown is being calculated correctly."""
     # Create simple return series
@@ -32,10 +42,10 @@ def test_max_drawdown():
     assert risk.loc['TEST', 'vol_annual'] > 0, "Volatility should be positive"
 
 
-def test_sharpe_ratio():
+def test_sharpe_ratio(random_seed):
     """Test Sharpe Ratio calculation."""
     # Create random returns
-    np.random.seed(42)
+    np.random.seed(random_seed)
     returns = pd.DataFrame({
         'TEST': np.random.normal(0.0005, 0.01, 252)
     })
@@ -59,8 +69,9 @@ def test_returns_calculation():
     assert not returns.isnull().any().any(), "Returns should not contain NaN"
 
 
-def test_risk_metrics_shape():
+def test_risk_metrics_shape(random_seed):
     """Test that risk metrics have correct shape."""
+    np.random.seed(random_seed)
     returns = pd.DataFrame({
         'STOCK1': np.random.normal(0.0005, 0.01, 252),
         'STOCK2': np.random.normal(0.0003, 0.015, 252)
@@ -123,9 +134,9 @@ def test_quality_metrics():
     assert qual.loc['STOCK1', 'debt_to_equity'] == 0.5, "D/E should be converted from percentage"
 
 
-def test_var_and_cvar():
+def test_var_and_cvar(random_seed):
     """Test VaR and CVaR calculations."""
-    np.random.seed(42)
+    np.random.seed(random_seed)
     returns = pd.DataFrame({
         'TEST': np.random.normal(0, 0.02, 1000)
     })
