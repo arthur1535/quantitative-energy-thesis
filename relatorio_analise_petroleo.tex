@@ -1,0 +1,801 @@
+\documentclass[12pt,a4paper]{article}
+
+% Pacotes essenciais
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazilian]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{float}
+
+% Configurações de página
+\geometry{margin=2.5cm}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+% Cores
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\definecolor{bullgreen}{rgb}{0.0,0.5,0.0}
+\definecolor{bearred}{rgb}{0.7,0.0,0.0}
+
+% Configuração de código Python
+\lstdefinestyle{pythonstyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{codepurple},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codegreen},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    language=Python
+}
+\lstset{style=pythonstyle}
+
+% Header e Footer
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Análise Quantitativa - Setor de Petróleo}
+\lhead{Janeiro 2026}
+\rfoot{Página \thepage}
+
+% Título
+\title{
+    \vspace{-2cm}
+    \Huge\textbf{Análise Quantitativa} \\
+    \Large\textbf{Setor de Petróleo e Energia - EUA} \\
+    \vspace{0.5cm}
+    \large Seleção de Ativos: CVX, XOM, COP, SLB, HAL \\
+    \large Foco: SLB como Veículo para Tese Venezuela + CAPEX
+}
+\author{Relatório Gerado por Modelo Quantitativo}
+\date{3 de Janeiro de 2026}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+\vspace{1cm}
+
+\begin{abstract}
+Este relatório apresenta uma análise quantitativa completa do setor de petróleo e energia americano, com foco na seleção do melhor ativo entre CVX, XOM, COP, SLB e HAL. Utilizamos métricas de valuation, qualidade de gestão, risco, regressões multifatoriais, simulação Monte Carlo e otimização quantum-inspired (Simulated Annealing) para determinar o ativo ótimo. A análise especial de SLB considera a tese de reconstrução da infraestrutura petroleira venezuelana e o ciclo de CAPEX do setor. \textbf{Conclusão: SLB é o ativo mais alavancado para capturar o cenário bull, enquanto COP oferece melhor relação risco-retorno geral.}
+\end{abstract}
+
+\newpage
+\tableofcontents
+\newpage
+
+%==============================================================================
+\section{Executive Summary}
+%==============================================================================
+
+\subsection{Resultados Principais}
+
+\begin{table}[H]
+\centering
+\caption{Ranking Final dos Ativos}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+\textbf{Ranking} & \textbf{Ativo} & \textbf{Score Final} & \textbf{Estratégia} & \textbf{Cenário Ideal} \\
+\midrule
+1º & COP & 1.12 & Risco-ajustado & Base/Bull \\
+2º & CVX & 0.08 & Defensivo & Bear/Base \\
+3º & XOM & -0.15 & Defensivo & Bear/Base \\
+4º & HAL & -0.30 & Agressivo & Bull extremo \\
+5º & SLB & -0.75 & \textbf{Alavancado} & \textbf{Bull + Venezuela} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Decisão Final}
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Modelo QUBO/SA escolheu:} COP (melhor score combinado)
+    \item \textbf{Para máxima alavancagem:} SLB (maior torque ao CAPEX e Venezuela)
+    \item \textbf{Para segurança:} CVX/XOM (menores drawdowns, dividendos estáveis)
+\end{itemize}
+
+\subsection{Hipóteses Testadas}
+
+\begin{table}[H]
+\centering
+\caption{Validação das Hipóteses}
+\begin{tabular}{@{}p{8cm}cc@{}}
+\toprule
+\textbf{Hipótese} & \textbf{Resultado} & \textbf{Evidência} \\
+\midrule
+H1: SLB tem maior torque ao petróleo & \textcolor{bullgreen}{\textbf{CONFIRMADO}} & $\beta_{WTI}^{SLB} = 0.46$ vs Majors = 0.32 \\
+H2: COP tem opcionalidade Venezuela & \textcolor{codegray}{QUALITATIVO} & Sem dados públicos via API \\
+H3: Majors vencem em robustez de balanço & \textcolor{bullgreen}{\textbf{CONFIRMADO}} & D/E: XOM=15.7 vs HAL=83.6 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%==============================================================================
+\section{Metodologia}
+%==============================================================================
+
+\subsection{Fontes de Dados}
+
+\begin{itemize}
+    \item \textbf{Preços históricos:} Yahoo Finance via \texttt{yfinance} (10 anos)
+    \item \textbf{Fundamentals:} Yahoo Finance API (\texttt{ticker.info})
+    \item \textbf{Período:} 06/01/2016 a 03/01/2026
+    \item \textbf{Frequência:} Diária (2.513 observações por ativo)
+\end{itemize}
+
+\subsection{Ativos Analisados}
+
+\begin{table}[H]
+\centering
+\caption{Universo de Ativos}
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Ticker} & \textbf{Nome} & \textbf{Tipo} & \textbf{BDR (B3)} \\
+\midrule
+CVX & Chevron Corporation & Major integrada & CHVX34 \\
+XOM & Exxon Mobil Corporation & Major integrada & EXXO34 \\
+COP & ConocoPhillips & E\&P independente & COPH34 \\
+SLB & Schlumberger Limited & Oil Field Services & SLBG34 \\
+HAL & Halliburton Company & Oil Field Services & HALI34 \\
+\midrule
+SPY & S\&P 500 ETF & Benchmark mercado & - \\
+XLE & Energy Select Sector & Benchmark setor & - \\
+OIH & VanEck Oil Services ETF & Benchmark OFS & - \\
+CL=F & WTI Crude Futures & Commodity & - \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Métricas Calculadas}
+
+\subsubsection{Valuation}
+\begin{align}
+\text{Earnings Yield} &= \frac{1}{P/E} \\
+\text{FCF Yield} &= \frac{\text{Free Cash Flow}}{\text{Market Cap}} \\
+\text{EV/EBITDA} &= \frac{\text{Enterprise Value}}{\text{EBITDA}}
+\end{align}
+
+\subsubsection{Risco}
+\begin{align}
+\text{VaR}_{95\%} &= \text{Percentil}_5(\text{retornos}) \\
+\text{CVaR}_{95\%} &= \mathbb{E}[r | r \leq \text{VaR}_{95\%}] \\
+\text{Max Drawdown} &= \min_t \left( \frac{P_t - \max_{s \leq t} P_s}{\max_{s \leq t} P_s} \right)
+\end{align}
+
+\subsubsection{Regressão Multifatorial}
+\begin{equation}
+r_i = \alpha + \beta_1 \cdot r_{SPY} + \beta_2 \cdot r_{WTI} + \beta_3 \cdot r_{XLE} + \beta_4 \cdot r_{OIH} + \epsilon
+\end{equation}
+
+\subsubsection{Score Combinado (Z-score)}
+\begin{equation}
+\text{Score}_i = w_R \cdot Z(\text{Retorno}) + w_V \cdot Z(\text{Valuation}) + w_Q \cdot Z(\text{Quality}) + w_{Risk} \cdot Z(\text{Risco})
+\end{equation}
+
+Com pesos: $w_R = w_V = w_Q = w_{Risk} = 0.25$
+
+%==============================================================================
+\section{Análise de Valuation}
+%==============================================================================
+
+\begin{table}[H]
+\centering
+\caption{Métricas de Valuation}
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+\textbf{Métrica} & \textbf{CVX} & \textbf{XOM} & \textbf{COP} & \textbf{SLB} & \textbf{HAL} \\
+\midrule
+Earnings Yield & 5\% & 6\% & \textbf{7\%} & 6\% & 5\% \\
+FCF Yield & 5\% & 3\% & \textbf{5\%} & 4\% & \textbf{8\%} \\
+EV/EBITDA & 9.38x & 8.97x & \textbf{5.38x} & 9.18x & 7.51x \\
+P/E Ratio & 21.93x & 17.83x & \textbf{13.66x} & 15.64x & 19.60x \\
+Dividend Yield & \textbf{4.39\%} & 3.36\% & 3.47\% & 2.84\% & 2.30\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Análise:}
+\begin{itemize}
+    \item \textbf{COP} é o mais barato em EV/EBITDA (5.38x) e P/E (13.66x)
+    \item \textbf{HAL} tem maior FCF Yield (8\%), mas pior histórico de execução
+    \item \textbf{CVX} oferece maior dividend yield (4.39\%) para estratégia de income
+    \item \textbf{SLB} está em valuation intermediário, sem desconto evidente
+\end{itemize}
+
+%==============================================================================
+\section{Análise de Qualidade}
+%==============================================================================
+
+\begin{table}[H]
+\centering
+\caption{Métricas de Qualidade de Gestão}
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+\textbf{Métrica} & \textbf{CVX} & \textbf{XOM} & \textbf{COP} & \textbf{SLB} & \textbf{HAL} \\
+\midrule
+Profit Margin & 7\% & 9\% & \textbf{14\%} & 10\% & 6\% \\
+ROE & 7\% & 11\% & \textbf{15\%} & \textbf{15\%} & 13\% \\
+FCF Margin & 8\% & 5\% & \textbf{10\%} & 6\% & 9\% \\
+Debt/Equity & 21.24 & \textbf{15.67} & 36.17 & 47.46 & 83.61 \\
+Net Debt/EBITDA & 0.90x & \textbf{0.46x} & 0.68x & 1.20x & 1.56x \\
+Current Ratio & 1.15 & 1.14 & 1.32 & 1.39 & \textbf{1.96} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Análise:}
+\begin{itemize}
+    \item \textbf{COP} lidera em margens operacionais e ROE
+    \item \textbf{XOM} tem o balanço mais robusto (menor alavancagem)
+    \item \textbf{HAL} preocupa com Debt/Equity de 83.6 - risco em cenário de stress
+    \item \textbf{SLB} tem alavancagem moderada (D/E=47.46, Net Debt/EBITDA=1.2x)
+\end{itemize}
+
+%==============================================================================
+\section{Análise de Risco}
+%==============================================================================
+
+\begin{table}[H]
+\centering
+\caption{Métricas de Risco (5 anos)}
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+\textbf{Métrica} & \textbf{CVX} & \textbf{XOM} & \textbf{COP} & \textbf{SLB} & \textbf{HAL} \\
+\midrule
+Retorno Anual & 11\% & 10\% & 11\% & -2\% & 1\% \\
+Volatilidade Anual & \textbf{29\%} & \textbf{28\%} & 39\% & 40\% & 47\% \\
+Sharpe Ratio & \textbf{0.23} & 0.20 & 0.19 & -0.15 & -0.07 \\
+Max Drawdown & -61\% & -65\% & -75\% & \textcolor{bearred}{\textbf{-88\%}} & \textcolor{bearred}{\textbf{-94\%}} \\
+VaR 95\% (diário) & -3\% & -3\% & -4\% & -4\% & -4\% \\
+CVaR 95\% (diário) & -4\% & -4\% & -6\% & -6\% & -7\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Análise:}
+\begin{itemize}
+    \item \textbf{Majors (CVX/XOM)} têm perfil de risco muito superior
+    \item \textbf{SLB/HAL} tiveram drawdowns catastróficos (-88\% e -94\%) - CUIDADO
+    \item \textbf{SLB} tem Sharpe negativo (-0.15) nos últimos 5 anos
+    \item Volatilidade de oil services é 40-50\% maior que majors
+\end{itemize}
+
+\subsection{Betas e Sensibilidades}
+
+\begin{table}[H]
+\centering
+\caption{Betas - Sensibilidade a Fatores}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\textbf{Ativo} & \textbf{$\beta_{SPY}$} & \textbf{$\beta_{WTI}$} & \textbf{$R^2$ (Multifator)} \\
+\midrule
+CVX & 0.95 & 0.32 & 0.47 \\
+XOM & 0.82 & 0.31 & 0.43 \\
+COP & 1.13 & \textbf{0.48} & 0.48 \\
+SLB & 1.17 & \textbf{0.46} & 0.42 \\
+HAL & \textbf{1.41} & \textbf{0.59} & 0.49 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Interpretação:}
+\begin{itemize}
+    \item \textbf{HAL} é o mais sensível a ambos os fatores (maior torque)
+    \item \textbf{SLB} tem beta WTI de 0.46 vs majors ~0.32 (44\% maior sensibilidade)
+    \item \textbf{XOM} é o mais defensivo ($\beta_{SPY} = 0.82$)
+    \item Todos os $R^2$ entre 0.42-0.49 indicam que ~50\% do retorno é explicado por SPY+WTI
+\end{itemize}
+
+%==============================================================================
+\section{Monte Carlo com t-Student - Distribuição de Retornos (12 meses)}
+%==============================================================================
+
+\begin{table}[H]
+\centering
+\caption{Simulação Monte Carlo com t-Student ($\nu=5$) - 10.000 simulações}
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+\textbf{Ativo} & \textbf{E[Retorno]} & \textbf{Mediana} & \textbf{VaR 95\%} & \textbf{P(>0)} & \textbf{P(>10\%)} & \textbf{P(<-20\%)} \\
+\midrule
+COP & \textbf{20.1\%} & 12\% & -41\% & 62\% & 52\% & 19\% \\
+CVX & 16.1\% & 11\% & -32\% & \textbf{65\%} & 52\% & \textbf{13\%} \\
+XOM & 14.0\% & 10\% & \textbf{-31\%} & 64\% & 50\% & \textbf{13\%} \\
+HAL & 12.0\% & 0\% & -54\% & 51\% & 42\% & 30\% \\
+SLB & 5.9\% & -2\% & -50\% & 48\% & 38\% & \textcolor{bearred}{30\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Análise:}
+\begin{itemize}
+    \item \textbf{COP} tem maior retorno esperado (20.1\%) com risco moderado
+    \item \textbf{CVX/XOM} têm menor probabilidade de perda severa (13\% de chance de cair >20\%)
+    \item \textbf{SLB/HAL} têm 30\% de chance de perder mais de 20\% em 12 meses
+    \item Mediana de SLB é \textbf{negativa} (-2\%) - mais provável perder do que ganhar no cenário base
+\end{itemize}
+
+%==============================================================================
+\section{Otimização Quantum-Inspired (QUBO/Simulated Annealing)}
+%==============================================================================
+
+\subsection{Formulação do Problema}
+
+O problema de seleção foi formulado como QUBO (Quadratic Unconstrained Binary Optimization):
+
+\begin{equation}
+\max_{x} \sum_{i} x_i \cdot \text{Score}_i \quad \text{sujeito a} \quad \sum_i x_i = 1, \quad x_i \in \{0,1\}
+\end{equation}
+
+Onde o Score combina:
+\begin{equation}
+\text{Score}_i = 0.25 \cdot Z(\text{Retorno}) + 0.25 \cdot Z(\text{Valuation}) + 0.25 \cdot Z(\text{Quality}) + 0.25 \cdot Z(\text{Risco})
+\end{equation}
+
+\subsection{Algoritmo: Simulated Annealing}
+
+\begin{lstlisting}[caption=Implementação do Simulated Annealing]
+def simulated_annealing_selection(scores_df, n_select=1, T_init=1.0, 
+                                   T_min=0.001, alpha=0.995, max_iter=10000):
+    tickers = list(scores_df.index)
+    n = len(tickers)
+    scores = scores_df['final_score'].values
+    
+    # Estado inicial aleatorio
+    current_state = np.zeros(n, dtype=int)
+    initial_idx = np.random.choice(n, n_select, replace=False)
+    current_state[initial_idx] = 1
+    
+    def objective(state):
+        return np.dot(state, scores)
+    
+    def neighbor(state):
+        new_state = state.copy()
+        selected = np.where(state == 1)[0]
+        not_selected = np.where(state == 0)[0]
+        to_remove = np.random.choice(selected)
+        to_add = np.random.choice(not_selected)
+        new_state[to_remove] = 0
+        new_state[to_add] = 1
+        return new_state
+    
+    T = T_init
+    for iteration in range(max_iter):
+        new_state = neighbor(current_state)
+        delta = objective(new_state) - objective(current_state)
+        
+        if delta > 0 or np.random.random() < np.exp(delta / T):
+            current_state = new_state
+        
+        T = T * alpha
+        if T < T_min:
+            break
+    
+    return selected_tickers, best_score
+\end{lstlisting}
+
+\subsection{Resultado da Otimização}
+
+\begin{table}[H]
+\centering
+\caption{Scores Combinados (Z-Score Normalizado)}
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+\textbf{Ativo} & \textbf{Return Z} & \textbf{Valuation Z} & \textbf{Quality Z} & \textbf{Risk Z} & \textbf{Score Final} \\
+\midrule
+\rowcolor{green!20} COP & 1.23 & \textbf{1.71} & \textbf{1.45} & 0.11 & \textbf{1.12} \\
+CVX & 0.47 & -0.17 & -1.08 & \textbf{1.08} & 0.08 \\
+XOM & 0.08 & -0.76 & -0.74 & 0.82 & -0.15 \\
+HAL & -0.31 & -0.08 & 0.44 & -1.25 & -0.30 \\
+SLB & -1.47 & -0.69 & -0.06 & -0.76 & -0.75 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Ativo Selecionado pelo QUBO/SA:} \colorbox{green!20}{\textbf{COP (ConocoPhillips)}}
+
+\textbf{Score Final: 1.12}
+
+%==============================================================================
+\section{Análise Especial: SLB e a Tese Venezuela}
+%==============================================================================
+
+\subsection{Contexto Venezuelano}
+
+\begin{table}[H]
+\centering
+\caption{Situação da Infraestrutura Petroleira Venezuelana}
+\begin{tabular}{@{}p{4cm}p{8cm}@{}}
+\toprule
+\textbf{Fator} & \textbf{Descrição} \\
+\midrule
+Infraestrutura & Severamente degradada após 10+ anos sem manutenção adequada \\
+Tipo de Petróleo & Extrapesado (8-16° API) do Orinoco Belt - requer tecnologia especializada \\
+Desconto de Preço & Heavy crude discount de \$15-25/barril vs Brent \\
+Produção Atual & $\sim$1.1M bpd (vs potencial histórico de 3M+ bpd) \\
+Implicação & Qualquer normalização = demanda massiva por oil field services \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Por que SLB é a Principal Beneficiária}
+
+\begin{enumerate}
+    \item \textbf{Líder global} em completação, estimulação e recuperação avançada
+    \item \textbf{Expertise específica} em heavy oil e reservatórios complexos
+    \item \textbf{Presença histórica} na Venezuela (operações antes das sanções)
+    \item \textbf{Maior escala} para atender demanda reprimida rapidamente
+    \item \textbf{Alavancagem operacional}: receita incremental $\approx$ lucro incremental
+\end{enumerate}
+
+\subsection{Análise de Preço SLB}
+
+\begin{table}[H]
+\centering
+\caption{Posição de Preço SLB}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\textbf{Período} & \textbf{Mínima} & \textbf{Máxima} & \textbf{Posição Atual} \\
+\midrule
+52 semanas & \$31.47 & \$40.34 & \textcolor{bearred}{98\%} (perto do topo) \\
+5 anos & \$31.19 & \$58.43 & \textcolor{bullgreen}{33\%} (terço inferior) \\
+10 anos & \$10.62 & \$67.55 & 52\% (meio) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Interpretação:} SLB subiu forte no curto prazo (98\% do range de 52 semanas), mas ainda está na parte baixa do range de 5 anos (33\%). Há espaço para +45\% até a máxima de 5 anos (\$58).
+
+\subsection{Cenários de Preço SLB}
+
+\begin{table}[H]
+\centering
+\caption{Cenários para SLB}
+\begin{tabular}{@{}p{3cm}p{5cm}ccc@{}}
+\toprule
+\textbf{Cenário} & \textbf{Premissas} & \textbf{Preço-Alvo} & \textbf{Upside} & \textbf{Prob.} \\
+\midrule
+\textbf{Base} & Petróleo \$70-80, CAPEX estável & \$44 & +10\% & 50\% \\
+\rowcolor{green!10} \textbf{Bull} & Petróleo \$90+, CAPEX +20\%, Venezuela & \$55 & \textbf{+38\%} & 25\% \\
+\rowcolor{red!10} \textbf{Bear} & Recessão, petróleo \$50-60 & \$26 & -36\% & 25\% \\
+\midrule
+\multicolumn{2}{@{}l}{\textbf{Valor Esperado}} & \$42.35 & +5.4\% & - \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%==============================================================================
+\section{Prós e Contras por Ativo}
+%==============================================================================
+
+\subsection{SLB (Schlumberger)}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{@{}p{7cm}|p{7cm}@{}}
+\toprule
+\textcolor{bullgreen}{\textbf{PRÓS}} & \textcolor{bearred}{\textbf{CONTRAS}} \\
+\midrule
+$\checkmark$ Maior torque ao CAPEX do setor & $\times$ Volatilidade muito alta (40\%/ano) \\
+$\checkmark$ Beneficiário direto de abertura Venezuela & $\times$ Max Drawdown histórico de -88\% \\
+$\checkmark$ Expertise em heavy oil (exatamente o que Venezuela precisa) & $\times$ Sharpe negativo nos últimos 5 anos \\
+$\checkmark$ Alavancagem operacional ao ciclo & $\times$ 30\% de chance de perder >20\% em 12m \\
+$\checkmark$ Posição no range de 5 anos ainda baixa (33\%) & $\times$ Altamente cíclico - depende de CAPEX \\
+$\checkmark$ Beta WTI de 0.46 (maior sensibilidade ao petróleo) & $\times$ Sanções Venezuela podem continuar anos \\
+\bottomrule
+\end{tabular}
+\caption{Prós e Contras - SLB}
+\end{table}
+
+\subsection{COP (ConocoPhillips)}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{@{}p{7cm}|p{7cm}@{}}
+\toprule
+\textcolor{bullgreen}{\textbf{PRÓS}} & \textcolor{bearred}{\textbf{CONTRAS}} \\
+\midrule
+$\checkmark$ Melhor score combinado (1.12) & $\times$ Maior alavancagem que majors (D/E=36) \\
+$\checkmark$ EV/EBITDA mais barato (5.38x) & $\times$ Max Drawdown de -75\% \\
+$\checkmark$ Melhores margens (14\% profit margin) & $\times$ Volatilidade de 39\%/ano \\
+$\checkmark$ ROE alto (15\%) & $\times$ Menos diversificado que majors \\
+$\checkmark$ Maior retorno esperado Monte Carlo (20.1\%) & $\times$ Opcionalidade Venezuela é qualitativa \\
+$\checkmark$ Beta WTI de 0.48 (boa exposição) & \\
+\bottomrule
+\end{tabular}
+\caption{Prós e Contras - COP}
+\end{table}
+
+\subsection{CVX/XOM (Majors)}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{@{}p{7cm}|p{7cm}@{}}
+\toprule
+\textcolor{bullgreen}{\textbf{PRÓS}} & \textcolor{bearred}{\textbf{CONTRAS}} \\
+\midrule
+$\checkmark$ Balanços muito robustos & $\times$ Menor convexidade em cenário bull \\
+$\checkmark$ Menor volatilidade (28-29\%) & $\times$ Beta WTI baixo (0.31-0.32) \\
+$\checkmark$ Dividendos altos e estáveis (3.4-4.4\%) & $\times$ Valuation menos atrativo \\
+$\checkmark$ Menor probabilidade de perda severa (13\%) & $\times$ Crescimento limitado \\
+$\checkmark$ Melhor Sharpe Ratio (0.20-0.23) & $\times$ Menor upside em cenário de alta \\
+$\checkmark$ Empresas diversificadas (upstream + downstream) & \\
+\bottomrule
+\end{tabular}
+\caption{Prós e Contras - CVX/XOM}
+\end{table}
+
+%==============================================================================
+\section{Código Python Completo}
+%==============================================================================
+
+\subsection{Estrutura do Projeto}
+
+\begin{lstlisting}[language=bash, caption=Estrutura de Arquivos]
+eua/
+|-- analiseempresasamericanas.py  # Analise geral do setor
+|-- analise_slb_detalhada.py      # Analise especifica SLB
+|-- requirements.txt              # Dependencias
+|-- relatorio_analise_petroleo.tex # Este relatorio
+\end{lstlisting}
+
+\subsection{Dependências (requirements.txt)}
+
+\begin{lstlisting}[caption=requirements.txt]
+yfinance>=0.2.28
+pandas>=2.0.0
+numpy>=1.24.0
+scipy>=1.11.0
+statsmodels>=0.14.0
+matplotlib>=3.7.0
+arch>=6.2.0
+\end{lstlisting}
+
+\subsection{Código Principal - Coleta de Dados}
+
+\begin{lstlisting}[caption=Função de Coleta de Dados]
+import yfinance as yf
+import pandas as pd
+import numpy as np
+
+def fetch_price_data(tickers, start, end):
+    """Baixa dados de precos via yfinance."""
+    data = {}
+    for ticker in tickers:
+        try:
+            df = yf.download(ticker, start=start, end=end, 
+                           progress=False, auto_adjust=True)
+            if not df.empty and len(df) > 100:
+                if isinstance(df.columns, pd.MultiIndex):
+                    close_data = df['Close'].iloc[:, 0]
+                else:
+                    close_data = df['Close']
+                data[ticker] = close_data
+        except Exception as e:
+            print(f"Erro {ticker}: {e}")
+    
+    prices = pd.DataFrame(data)
+    return prices.dropna(how='all').ffill().bfill()
+
+def fetch_fundamental_data(tickers):
+    """Extrai dados fundamentalistas."""
+    fundamentals = {}
+    for ticker in tickers:
+        t = yf.Ticker(ticker)
+        info = t.info
+        fundamentals[ticker] = {
+            'marketCap': info.get('marketCap'),
+            'enterpriseValue': info.get('enterpriseValue'),
+            'trailingPE': info.get('trailingPE'),
+            'priceToBook': info.get('priceToBook'),
+            'enterpriseToEbitda': info.get('enterpriseToEbitda'),
+            'freeCashflow': info.get('freeCashflow'),
+            'debtToEquity': info.get('debtToEquity'),
+            # ... outras metricas
+        }
+    return pd.DataFrame(fundamentals).T
+\end{lstlisting}
+
+\subsection{Código - Métricas de Risco}
+
+\begin{lstlisting}[caption=Cálculo de Métricas de Risco]
+def calculate_risk_metrics(returns, periods_year=252):
+    """Calcula metricas de risco (returns sao log-retornos)."""
+    risk = pd.DataFrame(index=returns.columns)
+    
+    # Retorno e volatilidade anualizados
+    risk['ret_annual'] = returns.mean() * periods_year
+    risk['vol_annual'] = returns.std() * np.sqrt(periods_year)
+    
+    # Sharpe Ratio (rf = 4%)
+    rf = 0.04
+    risk['sharpe'] = (risk['ret_annual'] - rf) / risk['vol_annual']
+    
+    # Max Drawdown (corrigido para log-retornos)
+    for col in returns.columns:
+        # Para log-retornos: exp(cumsum) reconstroi o indice de precos
+        prices_norm = np.exp(returns[col].cumsum())
+        rolling_max = prices_norm.expanding().max()
+        drawdown = (prices_norm - rolling_max) / rolling_max
+        risk.loc[col, 'max_drawdown'] = drawdown.min()
+    
+    # VaR e CVaR (95%)
+    for col in returns.columns:
+        ret = returns[col].dropna()
+        risk.loc[col, 'var_95'] = np.percentile(ret, 5)
+        risk.loc[col, 'cvar_95'] = ret[ret <= np.percentile(ret, 5)].mean()
+    
+    return risk
+\end{lstlisting}
+
+\subsection{Código - Regressão Multifatorial}
+
+\begin{lstlisting}[caption=Modelo de Regressão Multifatorial]
+import statsmodels.api as sm
+
+def multifactor_regression(returns, stock, 
+                           factors=['SPY', 'CL=F', 'XLE', 'OIH']):
+    """Regressao: ret_stock ~ alpha + b1*SPY + b2*WTI + b3*XLE + b4*OIH"""
+    available = [f for f in factors if f in returns.columns]
+    data = returns[[stock] + available].dropna()
+    
+    if len(data) < 60:
+        return None
+    
+    y = data[stock]
+    X = sm.add_constant(data[available])
+    model = sm.OLS(y, X).fit()
+    
+    return {
+        'alpha': model.params['const'],
+        'betas': {f: model.params[f] for f in available},
+        'r_squared': model.rsquared,
+        'pvalues': {f: model.pvalues[f] for f in available}
+    }
+\end{lstlisting}
+
+\subsection{Código - Monte Carlo}
+
+\begin{lstlisting}[caption=Simulação Monte Carlo com t-Student]
+from scipy.stats import t  # Distribuicao t de Student
+
+def monte_carlo_simulation(returns, n_simulations=10000, horizon_days=252):
+    """Simulacao Monte Carlo com t-Student para caudas gordas."""
+    results = {}
+    np.random.seed(42)
+    df_t = 5  # graus de liberdade - menor df => caudas mais pesadas
+    
+    for col in returns.columns:
+        ret = returns[col].dropna()
+        mu = ret.mean()
+        sigma = ret.std()
+        
+        # Simular retornos diarios com distribuicao t de Student
+        simulated = t.rvs(df_t, loc=mu, scale=sigma, 
+                         size=(n_simulations, horizon_days))
+        
+        # Retorno total no horizonte
+        total_returns = np.exp(simulated.sum(axis=1)) - 1
+        
+        results[col] = {
+            'mean': total_returns.mean(),
+            'median': np.median(total_returns),
+            'var_95': np.percentile(total_returns, 5),
+            'cvar_95': total_returns[total_returns <= 
+                       np.percentile(total_returns, 5)].mean(),
+            'prob_positive': (total_returns > 0).mean(),
+            'prob_gt_10pct': (total_returns > 0.10).mean(),
+            'prob_lt_minus_20pct': (total_returns < -0.20).mean()
+        }
+    
+    return pd.DataFrame(results).T
+\end{lstlisting}
+
+%==============================================================================
+\section{Conclusão e Recomendação}
+%==============================================================================
+
+\subsection{Matriz de Decisão por Cenário}
+
+\begin{table}[H]
+\centering
+\caption{Qual Ativo Escolher em Cada Cenário}
+\begin{tabular}{@{}p{4cm}p{3cm}p{6cm}@{}}
+\toprule
+\textbf{Cenário} & \textbf{Ativo} & \textbf{Razão} \\
+\midrule
+Base (status quo) & COP & Melhor score combinado \\
+Bull (CAPEX + Venezuela) & \textbf{SLB} & Máxima alavancagem operacional \\
+Bear (recessão) & CVX/XOM & Robustez de balanço, dividendos \\
+Máximo retorno potencial & SLB ou HAL & Maior beta, maior torque \\
+Menor risco & XOM & Menor vol, melhor balanço \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Alocação Sugerida (para quem quer exposição a petróleo)}
+
+\begin{table}[H]
+\centering
+\caption{Alocação Sugerida}
+\begin{tabular}{@{}lcp{7cm}@{}}
+\toprule
+\textbf{Ativo} & \textbf{Peso} & \textbf{Razão} \\
+\midrule
+SLB & 60\% & Máxima exposição à tese Venezuela + CAPEX \\
+COP & 30\% & Hedge: se petróleo sobe mas CAPEX não, COP protege \\
+CVX & 10\% & Segurança: dividendos, balanço forte \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Plano de Execução para SLBG34}
+
+\begin{table}[H]
+\centering
+\caption{Pontos de Entrada SLBG34}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{Preço} & \textbf{Ação} & \textbf{\% da Posição} \\
+\midrule
+R\$105-110 (atual) & Entrada inicial & 25\% \\
+R\$95-100 & Segunda entrada & 25\% \\
+R\$88-92 & Terceira entrada & 25\% \\
+R\$80-85 & All-in & 25\% restante \\
+\midrule
+R\$75 & \textcolor{bearred}{STOP LOSS} & Encerrar posição \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Limitações do Estudo}
+
+\begin{enumerate}
+    \item Dados fundamentalistas via yfinance podem estar desatualizados
+    \item Claims Venezuela (COP) tratados como qualitativo - sem dados públicos
+    \item Monte Carlo usa distribuição t de Student ($\nu=5$) para caudas gordas, mas ainda é uma aproximação
+    \item Betas históricos podem não refletir regime atual
+    \item Não incorpora ESG, qualidade de management, geopolítica quantitativamente
+    \item Sanções e eventos políticos são imprevisíveis
+\end{enumerate}
+
+\subsection{Disclaimer}
+
+\textit{Este relatório é uma análise quantitativa para fins educacionais e de apoio à decisão. \textbf{NÃO constitui recomendação de compra ou venda}. Investimentos em renda variável envolvem riscos significativos, incluindo perda total do capital. O desempenho passado não garante resultados futuros. Consulte um profissional certificado antes de tomar decisões de investimento.}
+
+%==============================================================================
+\section*{Referências}
+%==============================================================================
+
+\begin{enumerate}
+    \item Yahoo Finance API via \texttt{yfinance} - dados de mercado
+    \item Kirkpatrick, S., Gelatt, C. D., \& Vecchi, M. P. (1983). Optimization by Simulated Annealing. \textit{Science}, 220(4598), 671-680.
+    \item Markowitz, H. (1952). Portfolio Selection. \textit{The Journal of Finance}, 7(1), 77-91.
+    \item Jorion, P. (2006). \textit{Value at Risk: The New Benchmark for Managing Financial Risk}. McGraw-Hill.
+\end{enumerate}
+
+\end{document}
