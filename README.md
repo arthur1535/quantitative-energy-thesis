@@ -1,5 +1,9 @@
 # Quantitative Energy Thesis
 
+[![Python](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Tests](https://github.com/arthur1535/quantitative-energy-thesis/workflows/Tests/badge.svg)](https://github.com/arthur1535/quantitative-energy-thesis/actions)
+
 Análise quantitativa do setor de petróleo e energia americano para seleção de ativos com métodos de otimização quantum-inspired.
 
 ## 📊 Visão Geral
@@ -40,10 +44,22 @@ Avaliação de **SLB como veículo para capturar**:
 ## 📁 Estrutura do Projeto
 
 ```
+├── src/
+│   ├── data_fetcher.py          # Funções de coleta de dados
+│   ├── metrics.py               # Cálculo de métricas
+│   ├── optimization.py          # QUBO/Simulated Annealing
+│   └── report_generator.py      # Geração de relatórios e visualizações
+├── tests/
+│   └── test_metrics.py          # Testes unitários
+├── notebooks/
+│   └── exploratory_analysis.ipynb  # Análise exploratória (futuro)
+├── output/
+│   └── results/                 # Resultados salvos (CSVs e gráficos)
 ├── analiseempresasamericanas.py   # Análise principal do setor
 ├── analise_slb_detalhada.py       # Deep-dive em SLB + tese Venezuela
 ├── relatorio_analise_petroleo.tex # Relatório LaTeX completo
 ├── requirements.txt               # Dependências Python
+├── .github/workflows/tests.yml    # CI/CD com GitHub Actions
 └── README.md
 ```
 
@@ -59,6 +75,9 @@ pip install -r requirements.txt
 
 # Execute a análise principal
 python analiseempresasamericanas.py
+
+# Execute os testes
+pytest tests/
 ```
 
 ## 📦 Dependências
@@ -70,7 +89,11 @@ numpy>=1.24.0
 scipy>=1.11.0
 statsmodels>=0.14.0
 matplotlib>=3.7.0
+seaborn>=0.12.0
 arch>=6.2.0
+pytest>=7.4.0
+black>=23.0.0
+flake8>=6.0.0
 ```
 
 ## 📈 Resultados
@@ -97,6 +120,17 @@ arch>=6.2.0
 | SLB | 60% | Máxima exposição à tese Venezuela + CAPEX |
 | COP | 30% | Hedge se petróleo sobe mas CAPEX não |
 | CVX | 10% | Segurança: dividendos, balanço forte |
+
+## 📊 Visualizações
+
+O projeto gera automaticamente visualizações que são salvas no diretório `output/`:
+
+- **Fronteira Eficiente**: Relação risco-retorno de todos os ativos
+- **Beta Rolling**: Evolução temporal do beta de cada ativo
+- **Matriz de Correlação**: Correlação entre retornos dos ativos
+- **Gráficos de Drawdown**: Evolução de preço e drawdown histórico
+
+Resultados são salvos em CSV com timestamp para análise posterior em `output/results/`.
 
 ## 📄 Relatório
 
