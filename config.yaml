@@ -1,0 +1,59 @@
+# Quantitative Energy Thesis Configuration
+
+# Tickers
+tickers:
+  stocks: ['CVX', 'XOM', 'COP', 'SLB', 'HAL']
+  etfs: ['XLE', 'OIH']
+  benchmarks: ['SPY', 'CL=F', 'BZ=F']
+
+# Time period (in years from current date)
+time_period:
+  years: 10
+
+# Scoring weights
+weights:
+  return: 0.25
+  valuation: 0.25
+  quality: 0.25
+  risk_penalty: 0.25
+
+# Monte Carlo simulation parameters
+monte_carlo:
+  n_simulations: 10000
+  horizon_days: 252
+  degrees_of_freedom: 5  # For Student's t distribution
+
+# Simulated Annealing parameters
+simulated_annealing:
+  n_select: 1
+  T_init: 1.0
+  T_min: 0.001
+  alpha: 0.995
+  max_iter: 10000
+
+# Portfolio optimization parameters
+portfolio_optimization:
+  max_weight: 0.40
+
+# Risk-free rate (for Sharpe ratio calculation)
+risk_free_rate: 0.04
+
+# Output directories
+output:
+  results: 'output/results'
+  plots: 'output'
+
+# Scenarios for analysis
+scenarios:
+  base:
+    prob: 0.50
+    wti_shock: 0.0
+    spy_shock: 0.0
+  bull:
+    prob: 0.30
+    wti_shock: 0.30
+    spy_shock: 0.15
+  bear:
+    prob: 0.20
+    wti_shock: -0.30
+    spy_shock: -0.20
