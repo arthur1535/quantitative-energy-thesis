@@ -1,3 +1,5 @@
+# pyright: reportUnknownMemberType=none, reportUnknownArgumentType=none, reportUnknownVariableType=none, reportMissingTypeArgument=none
+
 """
 ================================================================================
 ANÁLISE QUANTITATIVA - SETOR DE PETRÓLEO E ENERGIA (US)
@@ -11,17 +13,19 @@ Data: Janeiro 2026
 """
 
 import warnings
-warnings.filterwarnings('ignore')
+from datetime import datetime, timedelta
+from typing import Any, Dict, Iterable, Mapping, Optional, Sequence, Tuple, cast
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import yfinance as yf
-from datetime import datetime, timedelta
-from scipy import stats
-from scipy.optimize import minimize
-import statsmodels.api as sm
-import matplotlib.pyplot as plt
-from scipy.stats import t  # Student's t distribution for heavy-tailed Monte Carlo
+import statsmodels.api as sm  # type: ignore
+import yfinance as yf  # type: ignore
+from scipy import stats  # type: ignore
+from scipy.optimize import minimize  # type: ignore
+from scipy.stats import t  # type: ignore  # Student's t distribution for heavy-tailed Monte Carlo
+
+warnings.filterwarnings("ignore")
 
 # ==============================================================================
 # CONFIGURAÇÃO
@@ -70,15 +74,25 @@ print("="*70)
 # SEÇÃO 1: COLETA DE DADOS
 # ==============================================================================
 
-def fetch_price_data(tickers, start, end):
+def fetch_price_data(
+    tickers: Iterable[str], start: datetime, end: datetime
+) -> pd.DataFrame:
     """Baixa dados de preços via yfinance com tratamento de erros."""
     print("\n[1] Baixando dados de preços...")
     
-    data = {}
+    data: Dict[str, pd.Series] = {}
     for ticker in tickers:
         try:
-            df = yf.download(ticker, start=start, end=end, progress=False, auto_adjust=True)
-            if not df.empty and len(df) > 100:
+            df_raw = yf.download(
+                ticker,
+                start=start,
+                end=end,
+                progress=False,
+                auto_adjust=True,
+            )
+
+            if df_raw is not None and not df_raw.empty and len(df_raw) > 100:
+                df = cast(pd.DataFrame, df_raw)
                 # Extrair coluna Close (pode ser MultiIndex ou simples)
                 if isinstance(df.columns, pd.MultiIndex):
                     close_data = df['Close'][ticker] if ticker in df['Close'].columns else df['Close'].iloc[:, 0]
@@ -94,20 +108,20 @@ def fetch_price_data(tickers, start, end):
     if not data:
         raise ValueError("Nenhum dado de preço obtido!")
     
-    prices = pd.DataFrame(data)
-    prices = prices.dropna(how='all').ffill().bfill()
-    return prices
+    prices_df = pd.DataFrame(data)
+    prices_df = prices_df.dropna(how='all').ffill().bfill()
+    return prices_df
 
 
-def fetch_fundamental_data(tickers):
+def fetch_fundamental_data(tickers: Iterable[str]) -> pd.DataFrame:
     """Extrai dados fundamentalistas via yfinance."""
     print("\n[2] Baixando dados fundamentalistas...")
     
-    fundamentals = {}
+    fundamentals: Dict[str, Dict[str, Any]] = {}
     for ticker in tickers:
         try:
             t = yf.Ticker(ticker)
-            info = t.info
+            info: Mapping[str, Any] = t.info
             
             # Extrair métricas disponíveis
             fund = {

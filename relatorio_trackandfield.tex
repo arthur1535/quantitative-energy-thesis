@@ -1,0 +1,590 @@
+\documentclass[12pt, a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+\usepackage{amsmath, amssymb}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{longtable}
+\usepackage{colortbl}
+
+\geometry{left=2.5cm, right=2.5cm, top=3cm, bottom=3cm}
+
+% Cores
+\definecolor{azulescuro}{RGB}{0, 51, 102}
+\definecolor{verdepositivo}{RGB}{0, 128, 0}
+\definecolor{vermelhoneg}{RGB}{178, 34, 34}
+\definecolor{amareloalerta}{RGB}{204, 153, 0}
+\definecolor{cinzaclaro}{RGB}{240, 240, 240}
+\definecolor{cinzatabela}{RGB}{245, 245, 245}
+
+% Configurações
+\hypersetup{
+    colorlinks=true,
+    linkcolor=azulescuro,
+    urlcolor=azulescuro,
+    citecolor=azulescuro
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{azulescuro}Análise Quantitativa --- Track\&Field (TFCO4.SA)}
+\fancyhead[R]{\small\color{azulescuro}Março 2026}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\titleformat{\section}{\large\bfseries\color{azulescuro}}{}{0em}{}[\titlerule]
+\titleformat{\subsection}{\normalsize\bfseries\color{azulescuro}}{}{0em}{}
+
+\begin{document}
+
+% ============================================================================
+% CAPA
+% ============================================================================
+\begin{titlepage}
+\centering
+\vspace*{3cm}
+
+{\Huge\bfseries\color{azulescuro} Análise Quantitativa}\\[0.5cm]
+{\LARGE\color{azulescuro} Track\&Field (TFCO4.SA)}\\[1cm]
+
+\rule{\textwidth}{1pt}\\[0.5cm]
+
+{\large Valuation, Qualidade, Risco e Otimização}\\[0.3cm]
+{\large Comparação com Peers do Setor de Varejo/Moda}\\[2cm]
+
+\begin{tabular}{ll}
+\textbf{Data da Análise:} & 03 de Março de 2026 \\
+\textbf{Período de Dados:} & Mar/2021 -- Mar/2026 (5 anos) \\
+\textbf{Ativo Principal:} & TFCO4.SA (B3) \\
+\textbf{Setor:} & Varejo / Moda Esportiva \& Lifestyle \\
+\textbf{Taxa Livre de Risco:} & Selic 14,25\% a.a. \\
+\end{tabular}
+
+\vfill
+
+{\small\textit{Nota: Esta análise NÃO constitui recomendação de compra ou venda de ativos.\\
+É um framework quantitativo para apoio à decisão de investimento.}}
+
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% ============================================================================
+% 1. EXECUTIVE SUMMARY
+% ============================================================================
+\section{Executive Summary}
+
+\subsection{Resultado da Otimização}
+
+O framework quantitativo avaliou 6 ativos do setor de varejo/moda na B3 utilizando critérios de \textbf{Valuation}, \textbf{Qualidade}, \textbf{Risco} e \textbf{Monte Carlo}, com otimização via \textit{Simulated Annealing} (inspirado em computação quântica).
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Ativo selecionado (SA/QUBO):} Grendene (GRND3.SA) --- Score: 0,7289
+    \item \textbf{Ranking completo:} Grendene $>$ Vivara $>$ Track\&Field $>$ Grupo SBF $>$ Lojas Renner $>$ Alpargatas
+    \item \textbf{Carteira ótima (scipy):} Grendene 40\% + Vivara 40\% + Track\&Field 20\%
+\end{itemize}
+
+\subsection{Destaques Track\&Field}
+
+\begin{center}
+\begin{tabular}{lrl}
+\toprule
+\textbf{Métrica} & \textbf{Valor} & \textbf{Comentário} \\
+\midrule
+Preço atual & R\$ 16,58 & \\
+Posição 52 semanas & 80,1\% & Próximo do topo \\
+Market Cap & R\$ 2,51 B & Small/mid-cap \\
+P/E Trailing & 21,26x & Premium vs peers \\
+P/E Forward & 13,37x & Desconto forward \\
+EV/EBITDA & 13,26x & Acima da mediana do setor \\
+ROE & 28,27\% & \textcolor{verdepositivo}{Superior aos peers (16,1\%)} \\
+Retorno 1 ano & +72,2\% & \textcolor{verdepositivo}{Alpha +57,9\% vs CDI} \\
+Volatilidade & 36,9\% & \textcolor{verdepositivo}{Menor que peers (41,9\%)} \\
+Beta (Ibovespa) & 1,003 & Próximo do mercado \\
+Max Drawdown & $-48,9\%$ & Risco relevante \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ============================================================================
+% 2. TESE DE INVESTIMENTO
+% ============================================================================
+\section{Tese de Investimento}
+
+\subsection{Contexto: Track\&Field}
+
+A Track\&Field é uma das principais marcas brasileiras de moda fitness e lifestyle premium. O modelo de negócio é \textbf{asset-light}, baseado em franquias, e-commerce e lojas próprias, o que reduz a necessidade de capital e melhora o retorno sobre o patrimônio.
+
+\textbf{Catalisadores positivos:}
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{Tendência secular de wellness:} O mercado de fitness/lifestyle segue em expansão pós-pandemia, favorecendo marcas especializadas
+    \item \textbf{Modelo de franquias:} Permite crescimento acelerado com baixo capex próprio (30--50 lojas/ano)
+    \item \textbf{Expansão de e-commerce:} Canal D2C (direct-to-consumer) com margens superiores
+    \item \textbf{Margens premium:} Margem bruta de 56\% e ROE de 28\% são excepcionais para varejo brasileiro
+    \item \textbf{Geração de caixa:} FCF positivo e distribuição consistente de dividendos
+\end{enumerate}
+
+\textbf{Riscos principais:}
+\begin{enumerate}[leftmargin=*]
+    \item Alta sensibilidade ao ciclo econômico (Selic, emprego, confiança do consumidor)
+    \item Setor de varejo de moda é competitivo e cíclico
+    \item Pressão de custo por importação de matéria-prima (exposição cambial)
+    \item Small/mid-cap com liquidez mais restrita na B3
+    \item Dependência de shopping centers
+    \item Risco de execução na expansão acelerada
+\end{enumerate}
+
+% ============================================================================
+% 3. VALUATION COMPARATIVO
+% ============================================================================
+\section{Valuation Comparativo}
+
+\subsection{Múltiplos de Mercado}
+
+\begin{center}
+\small
+\begin{tabular}{lccccccc}
+\toprule
+\textbf{Empresa} & \textbf{E. Yield} & \textbf{FCF Yield} & \textbf{EV/EBITDA} & \textbf{P/E} & \textbf{P/B} & \textbf{Div. Yield} & \textbf{Cresc. Rec.} \\
+\midrule
+\rowcolor{cinzatabela}
+Track\&Field & 0,05 & 0,01 & 13,26x & 21,26x & 4,74x & 1,6\%$^*$ & 31\% \\
+Alpargatas & 0,04 & 0,02 & 23,29x & 26,86x & 2,16x & 4,3\% & 7\% \\
+\rowcolor{cinzatabela}
+Grupo SBF & 0,12 & 0,22 & 7,58x & 8,49x & 0,86x & 4,3\% & 9\% \\
+Lojas Renner & 0,09 & 0,11 & 7,25x & 11,16x & 1,46x & 5,9\% & 5\% \\
+\rowcolor{cinzatabela}
+Grendene & 0,16 & 0,04 & 9,49x & 6,16x & 1,10x & 27,1\%$^*$ & 1\% \\
+Vivara & 0,10 & $-0,05$ & 10,44x & 9,79x & 2,47x & 4,4\% & 18\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+{\footnotesize $^*$ Dividend Yield possivelmente distorcido por dados da API yfinance.}
+
+\subsection{Análise}
+
+A Track\&Field negocia a \textbf{P/E de 21,26x} (trailing), acima da mediana do grupo (10,28x), refletindo o prêmio por crescimento. No entanto, o \textbf{P/E forward de 13,37x} sugere expectativa de forte expansão de lucros, mais alinhado com o setor.
+
+O \textbf{EV/EBITDA de 13,26x} é o segundo mais alto do grupo (atrás apenas de Alpargatas a 23,29x), mas é justificado pelo crescimento de receita de 31\% --- significativamente acima dos peers.
+
+\textbf{Valuation Score (Z-Score):} $-0,93$, indicando que em termos puramente de múltiplos, a Track\&Field está \textit{relativamente cara} frente aos peers. O mercado já precifica parte do crescimento.
+
+% ============================================================================
+% 4. QUALIDADE
+% ============================================================================
+\section{Métricas de Qualidade}
+
+\subsection{Margens e Retornos}
+
+\begin{center}
+\small
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Empresa} & \textbf{M. Bruta} & \textbf{M. Oper.} & \textbf{M. Líq.} & \textbf{ROE} & \textbf{ROA} & \textbf{FCF/Rev} \\
+\midrule
+\rowcolor{cinzatabela}
+Track\&Field & \textbf{56\%} & \textbf{18\%} & 14\% & \textcolor{verdepositivo}{\textbf{28,3\%}} & \textbf{16\%} & 4\% \\
+Alpargatas & 48\% & 16\% & 8\% & 9\% & 3\% & 5\% \\
+\rowcolor{cinzatabela}
+Grupo SBF & 48\% & 7\% & 4\% & 11\% & 4\% & 8\% \\
+Lojas Renner & 61\% & 8\% & 9\% & 14\% & 6\% & 10\% \\
+\rowcolor{cinzatabela}
+Grendene & 47\% & 9\% & \textbf{27\%} & 18\% & 5\% & 7\% \\
+Vivara & \textbf{72\%} & \textbf{32\%} & 26\% & \textcolor{verdepositivo}{\textbf{28,0\%}} & 12\% & $-14\%$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Alavancagem e Liquidez}
+
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Empresa} & \textbf{D/E} & \textbf{Dív. Líq./EBITDA} & \textbf{Líq. Corrente} \\
+\midrule
+\rowcolor{cinzatabela}
+Track\&Field & 0,32x & 0,71x & 2,86x \\
+Alpargatas & 0,19x & $-0,50x$ & 2,40x \\
+\rowcolor{cinzatabela}
+Grupo SBF & 1,00x & 3,43x & 1,44x \\
+Lojas Renner & 0,28x & 0,54x & 1,76x \\
+\rowcolor{cinzatabela}
+Grendene & 0,02x & $-2,69x$ & 6,07x \\
+Vivara & 0,43x & 1,31x & 5,17x \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Análise}
+
+\textbf{Hipótese H1 --- CONFIRMADA:} A Track\&Field apresenta o \textbf{maior ROE do grupo} (28,27\% vs média de 16,12\% dos peers), combinado com margens operacionais robustas (18\%) e alavancagem controlada (D/E = 0,32x, Dív.Líq./EBITDA = 0,71x).
+
+O \textbf{Quality Score} de 0,54 (Z-Score) posiciona a Track\&Field como a 3ª melhor em qualidade, atrás de Vivara (1,28) e Grendene (0,51). Destaque para Vivara com margens brutas excepcionais (72\%) e Grendene com posição de caixa líquido ($-2,69x$ dív.líq./EBITDA).
+
+% ============================================================================
+% 5. RISCO
+% ============================================================================
+\section{Métricas de Risco}
+
+\subsection{Retorno, Volatilidade e VaR}
+
+\begin{center}
+\small
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Empresa} & \textbf{Ret. Anual} & \textbf{Vol. Anual} & \textbf{Sharpe} & \textbf{Max DD} & \textbf{VaR 95\%} & \textbf{CVaR 95\%} \\
+\midrule
+\rowcolor{cinzatabela}
+Track\&Field & 6\% & 37\% & $-0,22$ & $-49\%$ & $-3,7\%$ & $-5,1\%$ \\
+Alpargatas & $-15\%$ & 45\% & $-0,65$ & $-90\%$ & $-4,4\%$ & $-6,6\%$ \\
+\rowcolor{cinzatabela}
+Grupo SBF & $-10\%$ & 53\% & $-0,47$ & $-84\%$ & $-5,3\%$ & $-7,2\%$ \\
+Lojas Renner & $-11\%$ & 42\% & $-0,61$ & $-71\%$ & $-4,3\%$ & $-6,0\%$ \\
+\rowcolor{cinzatabela}
+Grendene & 6\% & 31\% & $-0,25$ & $-50\%$ & $-3,0\%$ & $-4,3\%$ \\
+Vivara & 9\% & 38\% & $-0,15$ & $-52\%$ & $-3,7\%$ & $-5,3\%$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Nota:} Sharpe negativo para todos os ativos reflete o efeito da alta taxa de juros brasileira (Selic 14,25\%). Neste cenário, o prêmio de risco de equities é estruturalmente baixo.
+
+\subsection{Betas (Sensibilidade ao Ibovespa)}
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Empresa} & \textbf{Beta} & \textbf{Interpretação} \\
+\midrule
+\rowcolor{cinzatabela}
+Track\&Field & 1,003 & Neutro (segue o mercado) \\
+Alpargatas & 1,293 & Agressivo \\
+\rowcolor{cinzatabela}
+Grupo SBF/Centauro & 1,735 & Muito agressivo \\
+Lojas Renner & 1,543 & Agressivo \\
+\rowcolor{cinzatabela}
+Grendene & 0,874 & \textcolor{verdepositivo}{Defensivo} \\
+Vivara & 1,279 & Agressivo \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Hipótese H3 --- CONFIRMADA:} A Track\&Field apresenta volatilidade anualizada de 36,9\%, inferior à média dos peers (41,9\%). Grendene é a mais defensiva (31\% vol, beta 0,87).
+
+% ============================================================================
+% 6. RETORNOS e ANÁLISE DETALHADA
+% ============================================================================
+\section{Análise Detalhada --- Track\&Field}
+
+\subsection{Retornos Acumulados}
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Período} & \textbf{TFCO4} & \textbf{CDI} \\
+\midrule
+1 mês & +2,7\% & $\approx$1,1\% \\
+3 meses & $-6,5\%$ & $\approx$3,4\% \\
+6 meses & +3,9\% & $\approx$6,9\% \\
+\textbf{1 ano} & \textcolor{verdepositivo}{\textbf{+72,2\%}} & \textbf{14,3\%} \\
+2 anos & +37,2\% & $\approx$27\% \\
+\midrule
+\textbf{Alpha vs CDI (1 ano)} & \multicolumn{2}{c}{\textcolor{verdepositivo}{\textbf{+57,9 p.p.}}} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+O retorno de 72,2\% no último ano demonstra forte recuperação e reavaliação pelo mercado. No entanto, o retorno de 2 anos (+37,2\%) mostra que houve períodos de queda significativa antes.
+
+\subsection{Drawdown}
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Max Drawdown (5 anos):} $-48,9\%$ --- queda severa, típica de small/mid-caps em momentos de estresse
+    \item \textbf{Drawdown Atual:} $-9,4\%$ --- ainda abaixo do topo recente, com espaço para recuperação
+\end{itemize}
+
+\subsection{Análise Técnica}
+
+\begin{center}
+\begin{tabular}{lrl}
+\toprule
+\textbf{Indicador} & \textbf{Valor} & \textbf{Sinal} \\
+\midrule
+Preço atual & R\$ 16,58 & \\
+SMA 20 & R\$ 16,90 & Abaixo (curto prazo fraco) \\
+SMA 50 & R\$ 16,23 & Acima \\
+SMA 200 & R\$ 15,93 & Acima (+4,1\%) \\
+\midrule
+Tendência & \multicolumn{2}{c}{Alta (Golden Cross)} \\
+RSI (14 dias) & 41,7 & Neutro \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+A tendência macro é de \textbf{alta} (SMA 50 $>$ SMA 200), apesar de fraqueza de curto prazo (preço abaixo da SMA 20). RSI neutro em 41,7 sugere ausência de sobrecompra.
+
+\subsection{Correlações}
+
+\begin{center}
+\begin{tabular}{lc}
+\toprule
+\textbf{Par} & \textbf{Correlação} \\
+\midrule
+TFCO4 vs Ibovespa & 0,468 \\
+TFCO4 vs Dólar (USDBRL) & $-0,030$ \\
+TFCO4 vs Lojas Renner & 0,466 \\
+TFCO4 vs Vivara & 0,463 \\
+TFCO4 vs Grupo SBF & 0,404 \\
+TFCO4 vs Grendene & 0,337 \\
+TFCO4 vs Alpargatas & 0,327 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Correlação moderada com o Ibovespa (0,47) e quase zero com o dólar, indicando que TFCO4 é primariamente um ativo de \textit{consumo doméstico} com baixa exposição cambial direta.
+
+% ============================================================================
+% 7. REGRESSÃO MULTIFATORIAL
+% ============================================================================
+\section{Regressão Multifatorial}
+
+\subsection{Modelo: $r_{TFCO4} = \alpha + \beta_1 \cdot r_{IBOV} + \beta_2 \cdot r_{USDBRL} + \varepsilon$}
+
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Empresa} & \textbf{Alpha (anual)} & $\boldsymbol{\beta_{IBOV}}$ & $\boldsymbol{\beta_{USDBRL}}$ \\
+\midrule
+\rowcolor{cinzatabela}
+Track\&Field & $-0,034$ & $1,004^{***}$ & $-0,093$ \\
+Alpargatas & $-0,275$ & $1,293^{***}$ & $-0,028$ \\
+\rowcolor{cinzatabela}
+Grupo SBF & $-0,272$ & $1,737^{***}$ & $-0,174^{**}$ \\
+Lojas Renner & $-0,259$ & $1,544^{***}$ & $-0,024$ \\
+\rowcolor{cinzatabela}
+Grendene & $-0,019$ & $0,875^{***}$ & $-0,041$ \\
+Vivara & $-0,037$ & $1,281^{***}$ & $-0,141^{**}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+{\footnotesize $^{***}p < 0,01$; $^{**}p < 0,05$; $^{*}p < 0,10$}
+
+\textbf{Destaques:}
+\begin{itemize}[leftmargin=*]
+    \item Track\&Field tem \textbf{alpha anualizado quase zero} ($-3,4\%$), indicando retorno próximo do esperado dado o beta
+    \item $R^2 = 0,22$: apenas 22\% da variação é explicada pelo mercado e câmbio (idiossincrasia alta)
+    \item Grupo SBF tem o maior beta (1,74) e Grendene o menor (0,87)
+    \item Sensibilidade cambial ($\beta_{USDBRL}$) é estatisticamente significativa apenas para Grupo SBF e Vivara
+\end{itemize}
+
+% ============================================================================
+% 8. MONTE CARLO
+% ============================================================================
+\section{Simulação Monte Carlo (12 meses)}
+
+Simulação com 10.000 trajetórias usando distribuição \textbf{t-Student} ($\nu = 5$) para capturar caudas gordas.
+
+\begin{center}
+\small
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Empresa} & \textbf{E[Ret]} & \textbf{Mediana} & \textbf{VaR 95\%} & \textbf{P($>$0)} & \textbf{P($>$CDI)} \\
+\midrule
+\rowcolor{cinzatabela}
+Track\&Field & 18,9\% & 7\% & $-51,4\%$ & 56\% & 43,9\% \\
+Alpargatas & 2,8\% & $-14\%$ & $-67,2\%$ & 40\% & 31,6\% \\
+\rowcolor{cinzatabela}
+Grupo SBF & 14,8\% & $-8\%$ & $-69,1\%$ & 45\% & 36,3\% \\
+Lojas Renner & 2,1\% & $-12\%$ & $-64,0\%$ & 41\% & 31,8\% \\
+\rowcolor{cinzatabela}
+Grendene & 15,6\% & 7\% & $-44,9\%$ & 57\% & 43,5\% \\
+Vivara & 23,0\% & 9\% & $-51,0\%$ & 57\% & 46,3\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Interpretação para TFCO4:}
+\begin{itemize}[leftmargin=*]
+    \item Retorno esperado de 18,9\% é atrativo, mas a mediana (7\%) é significativamente menor --- indica assimetria positiva (upside potencial grande, mas cenário provável mais modesto)
+    \item VaR 95\% de $-51,4\%$: há 5\% de chance de perder mais de metade do capital em 12 meses
+    \item Probabilidade de bater o CDI: apenas 43,9\% --- refletindo o custo de oportunidade da Selic alta
+    \item Vivara apresenta o melhor perfil: maior retorno esperado (23\%) e maior probabilidade de superar o CDI (46,3\%)
+\end{itemize}
+
+% ============================================================================
+% 9. SCORING E OTIMIZAÇÃO
+% ============================================================================
+\section{Scoring Combinado e Otimização}
+
+\subsection{Scores Z-Score por Dimensão}
+
+\begin{center}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Empresa} & \textbf{Return} & \textbf{Valuation} & \textbf{Quality} & \textbf{Risk} & \textbf{FINAL} \\
+\midrule
+Track\&Field & 0,71 & $-0,93$ & 0,54 & 0,94 & \textbf{0,31} \\
+Alpargatas & $-1,17$ & $-1,18$ & $-0,26$ & $-1,33$ & $-0,98$ \\
+Grupo SBF & 0,22 & 0,95 & $-1,58$ & $-0,97$ & $-0,34$ \\
+Lojas Renner & $-1,26$ & 0,44 & $-0,49$ & $-0,28$ & $-0,40$ \\
+\rowcolor{cinzatabela}
+\textbf{Grendene} & \textbf{0,32} & \textbf{1,19} & \textbf{0,51} & \textbf{0,89} & \textcolor{verdepositivo}{\textbf{0,73}} \\
+Vivara & 1,18 & $-0,48$ & 1,28 & 0,74 & \textbf{0,68} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Pesos: Return 25\% + Valuation 25\% + Quality 25\% + Risk Penalty 25\%.
+
+\subsection{Interpretação para Track\&Field}
+
+A TFCO4 ficou em \textbf{3º lugar} no ranking com score final de 0,31:
+\begin{itemize}[leftmargin=*]
+    \item \textcolor{verdepositivo}{\textbf{Pontos fortes:}} Return (0,71) e Risk (0,94) --- bom retorno esperado com risco controlado
+    \item \textcolor{vermelhoneg}{\textbf{Ponto fraco:}} Valuation ($-0,93$) --- múltiplos \textit{premium} penalizaram o score
+    \item O mercado já precificou boa parte do crescimento; upside adicional depende de execução
+\end{itemize}
+
+\subsection{Carteira Ótima (scipy)}
+
+A otimização contínua (máximo 40\% por ativo) resultou em:
+
+\begin{center}
+\begin{tabular}{lc}
+\toprule
+\textbf{Ativo} & \textbf{Peso} \\
+\midrule
+Grendene (GRND3.SA) & 40\% \\
+Vivara (VIVA3.SA) & 40\% \\
+Track\&Field (TFCO4.SA) & 20\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+A Track\&Field entra na carteira ótima com 20\%, validando sua qualidade apesar do valuation esticado.
+
+% ============================================================================
+% 10. CENÁRIOS
+% ============================================================================
+\section{Cenários de Preço}
+
+\begin{center}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Cenário} & \textbf{Prob.} & \textbf{Preço-Alvo} & \textbf{Retorno} & \textbf{Premissas} \\
+\midrule
+\rowcolor{cinzatabela}
+\textbf{Base} & 50\% & R\$ 18,57 & +12\% & SSS 8--10\%, 30--40 lojas/ano \\
+\textcolor{verdepositivo}{\textbf{Bull}} & 25\% & R\$ 23,38 & +41\% & Selic 11--12\%, consumo aquecido \\
+\rowcolor{cinzatabela}
+\textcolor{vermelhoneg}{\textbf{Bear}} & 25\% & R\$ 11,55 & $-30\%$ & Selic 15\%+, recessão \\
+\midrule
+\textbf{Valor Esperado} & --- & \textbf{R\$ 18,02} & \textbf{+8,7\%} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Cenário Base:} Crescimento regular de same-store-sales (SSS) de 8--10\%, abertura de 30--40 lojas/ano, Selic lateral. Expansão modesta de múltiplos.
+
+\textbf{Cenário Bull:} Queda da Selic para 11--12\%, consumo aquecido, expansão de e-commerce e novos mercados. EV/EBITDA expande para 16,3x.
+
+\textbf{Cenário Bear:} Selic sobe para 15\%+, desaceleração do consumo, pressão em margens. EV/EBITDA contrai para 10,3x.
+
+O \textbf{valor esperado de R\$ 18,02 (+8,7\%)} é modesto e \textbf{não supera o CDI} (14,25\%), sugerindo que no cenário base o custo de oportunidade é alto.
+
+% ============================================================================
+% 11. TESTE DE HIPÓTESES
+% ============================================================================
+\section{Teste de Hipóteses}
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Hipótese} & \textbf{Resultado} & \textbf{Evidência} \\
+\midrule
+H1: TFCO4 tem melhor qualidade & \textcolor{verdepositivo}{\textbf{CONFIRMADA}} & ROE 28,3\% vs peers 16,1\% \\
+H2: TFCO4 tem valuation atrativo & \textcolor{vermelhoneg}{\textbf{NÃO CONFIRMADA}} & EV/EBITDA 13,3x vs setor 11,6x \\
+H3: TFCO4 tem menor risco & \textcolor{verdepositivo}{\textbf{CONFIRMADA}} & Vol 36,9\% vs peers 41,9\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ============================================================================
+% 12. CONCLUSÃO
+% ============================================================================
+\section{Conclusão e Recomendação Condicional}
+
+\subsection{Posicionamento na Faixa de Preço}
+
+O preço atual de R\$ 16,58 está na \textbf{posição de 80\% da faixa de 52 semanas} (R\$ 9,61 -- R\$ 18,31), indicando que está \textcolor{vermelhoneg}{\textbf{próximo do topo}}.
+
+\subsection{Veredicto}
+
+\begin{center}
+\fcolorbox{amareloalerta}{cinzaclaro}{
+\parbox{0.85\textwidth}{
+\centering
+\textbf{\large CUIDADO --- Preço na parte alta do range}\\[0.3cm]
+Preço já andou bastante (+72\% em 12 meses). Valor esperado (+8,7\%) não supera o CDI (14,25\%). Esperar correção de 10--15\% pode ser prudente antes de iniciar posição.
+}
+}
+\end{center}
+
+\subsection{Estratégia Sugerida}
+
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{Se preço cair para R\$ 13--14 ($<$40\% do range):} Posição cheia (3--5\% do portfólio)
+    \item \textbf{Se preço ficar na faixa R\$ 14--16 (40--60\%):} Entrada parcial, acumular em correções
+    \item \textbf{No nível atual R\$ 16,58 ($>$80\%):} Esperar correção de 10--15\%
+    \item \textbf{Sempre:} Comparar retorno esperado vs CDI (14,25\% a.a.)
+    \item \textbf{Posição máxima:} 5--8\% do portfólio (small/mid-cap)
+\end{enumerate}
+
+\subsection{Alternativas no Setor}
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Grendene (GRND3):} Melhor score geral --- perfil defensivo com caixa líquido e dividendos altos
+    \item \textbf{Vivara (VIVA3):} Segundo melhor score --- luxo acessível com margens excepcionais
+    \item \textbf{Track\&Field (TFCO4):} Terceiro --- excelente qualidade, mas valuation já esticado
+\end{itemize}
+
+% ============================================================================
+% LIMITAÇÕES
+% ============================================================================
+\section{Limitações}
+
+\begin{itemize}[leftmargin=*]
+    \item Dados fundamentalistas via yfinance podem estar desatualizados ou incompletos
+    \item FCF e EBITDA dependem de disponibilidade na API
+    \item Não incorpora análise de management, ESG, ou fatores qualitativos
+    \item TFCO4 tem histórico curto na B3 (IPO 2020), limitando análises de longo prazo
+    \item Monte Carlo assume distribuição t-Student (melhor que normal, mas ainda limitado)
+    \item Betas históricos podem não refletir regime atual de Selic
+    \item Sem ajuste para dividendos extraordinários ou eventos corporativos
+    \item Peers podem ter modelos de negócio parcialmente diferentes (ex: Grendene = indústria)
+    \item Liquidez de TFCO4 pode resultar em spreads maiores vs large-caps
+    \item Dividend Yield de alguns ativos apresentou distorção na API (valores implausíveis)
+\end{itemize}
+
+\vfill
+\begin{center}
+\rule{0.5\textwidth}{0.4pt}\\[0.3cm]
+{\small\textit{Relatório gerado automaticamente a partir de dados coletados via yfinance.\\
+Análise quantitativa não substitui due diligence completa.\\
+Março de 2026.}}
+\end{center}
+
+\end{document}

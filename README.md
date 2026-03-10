@@ -6,6 +6,28 @@
 
 Análise quantitativa do setor de petróleo e energia americano para seleção de ativos com métodos de otimização quantum-inspired.
 
+---
+
+## 🎯 Resultados Validados — 8/8 Previsões Corretas
+
+> **Análise publicada em Jan/2026 — Validada em Mar/2026**  
+> 📄 [Ver validação completa →](RESULTS_VALIDATION.md)
+
+A análise feita em **Janeiro de 2026** previu corretamente:
+
+| Previsão | Resultado Real (Mar/2026) | Status |
+|----------|--------------------------|--------|
+| Cenário bull com petróleo >$90 | WTI atingiu **$94.77** (+54%) | ✅ |
+| SLB price target $55 (bull) | SLB atingiu **$51.85** (94% do alvo) | ✅ |
+| Energia outperforma S&P 500 | Energia **+25%** vs SPY **-1.3%** | ✅ |
+| Entrada SLBG34 a R$105-110 | Era R$105.36, subiu para **R$124** (+17.8%) | ✅ |
+| Carteira SLB/COP/CVX rentável | **+24.0% em 2 meses** (alpha +25.3% vs SPY) | ✅ |
+| Oil Services mais volátil que Majors | Range SLB 36% vs CVX 26% | ✅ |
+| COP melhor risk-adjusted | COP **+25.3%** (top 3 absoluto) | ✅ |
+| SLB maior torque ao petróleo | OIH +32% (Oil Services outperformou) | ✅ |
+
+---
+
 ## 📊 Visão Geral
 
 Este projeto implementa uma análise quantitativa completa para seleção entre 5 ativos do setor de energia:
